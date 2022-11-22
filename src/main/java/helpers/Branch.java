@@ -1,15 +1,17 @@
-import java.util.Arrays;
+package helpers;
 
 public class Branch {
     private int minBound;
     private String info;
     private int[][] pathMatrix;
+    private Branch parent;
     private Branch leftChild = null;
     private Branch rightChild = null;
 
-    public Branch(int minBound, String info, int[][] pathMatrix) {
+    public Branch(int minBound, String info, int[][] pathMatrix, Branch parent) {
         this.minBound = minBound;
         this.info = info;
+        this.parent = parent;
 
         this.pathMatrix = new int[pathMatrix.length][];
         for (int i = 0; i < pathMatrix.length; i++) {
@@ -17,6 +19,13 @@ public class Branch {
             System.arraycopy(pathMatrix[i], 0, this.pathMatrix[i], 0, pathMatrix[i].length);
         }
 
+    }
+
+    @Override
+    public String toString() {
+        return "Информация: " + info + "\n" +
+                "Нижняя граница: " + minBound + "\n" +
+                "Корень: " + parent.getInfo();
     }
 
     public Branch getLeftChild() {

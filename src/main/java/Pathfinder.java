@@ -1,6 +1,6 @@
-import java.lang.reflect.Array;
+import helpers.Branch;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static helpers.MatrixHelper.*;
 import static helpers.BranchAndBoundMethod.*;
@@ -29,10 +29,10 @@ public class Pathfinder {
         printMatrix(pathMatrix);
         System.out.println("Редукция столбцов успешно проведена");
 
-        int minBound = getLocalMinimumBound(pathMatrix);
+        int minBound = getLocalMinimumBound(pathMatrix, 0);
         System.out.println("Корневая нижняя граница равна " + minBound);
 
-        branches.add(new Branch(minBound, "Корень", pathMatrix));
+        branches.add(new Branch(minBound, "Начало", pathMatrix, null));
 
         calculateScore(branches.get(0).getPathMatrix());
         printMatrix(branches.get(0).getPathMatrix());
@@ -40,5 +40,10 @@ public class Pathfinder {
 
         int[] path = findMaxScore(branches.get(0).getPathMatrix());
         System.out.println("Выбран путь между точками " + (path[0]+1) + " и " + (path[1]+1));
+
+        System.out.println("====================================================");
+        System.out.println("====================================================");
+        System.out.println("Приступаем к нахождению правой ветви графа");
+        findRight(path,pathMatrix,branches.get(0));
     }
 }
