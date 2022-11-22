@@ -1,10 +1,10 @@
 package helpers;
 
 public class Branch {
-    private int minBound;
-    private String info;
-    private int[][] pathMatrix;
-    private Branch parent;
+    private final int minBound;
+    private final String info;
+    private final int[][] pathMatrix;
+    private final Branch parent;
     private Branch leftChild = null;
     private Branch rightChild = null;
 
@@ -54,5 +54,9 @@ public class Branch {
 
     public int[][] getPathMatrix() {
         return pathMatrix;
+    }
+
+    public Branch getParent() {
+        return parent;
     }
 }

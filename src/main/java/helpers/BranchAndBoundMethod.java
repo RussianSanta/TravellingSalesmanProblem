@@ -1,8 +1,12 @@
 package helpers;
 
+import java.util.ArrayList;
+
 import static helpers.MatrixHelper.printMatrix;
 
 public class BranchAndBoundMethod {
+    private static int lostPaths = -1;
+
     private BranchAndBoundMethod() {
 
     }
@@ -66,8 +70,8 @@ public class BranchAndBoundMethod {
     }
 
     private static int calculateScore(int[][] pathMatrix, int a, int b) {
-        int minRow = 9999;
-        int minColumn = 9999;
+        int minRow = 10000;
+        int minColumn = 10000;
 
         for (int i = 0; i < pathMatrix.length - 1; i++) {
             if (pathMatrix[i][b] < minRow && i != a) minRow = pathMatrix[i][b];
@@ -86,7 +90,7 @@ public class BranchAndBoundMethod {
         for (int i = 0; i < pathMatrix.length - 1; i++) {
             for (int j = 0; j < pathMatrix[i].length - 1; j++) {
                 int potential = calculateScore(pathMatrix, i, j);
-                if (potential > max) {
+                if (potential > max && potential < 10000) {
                     max = potential;
                     lastI = i;
                     lastJ = j;
@@ -96,8 +100,23 @@ public class BranchAndBoundMethod {
         return new int[]{lastI, lastJ, max};
     }
 
+    public static void createChildBranches(ArrayList<Branch> branches, Branch minimalBranch) {
+        int[] cyclePath = findMaxScore(minimalBranch.getPathMatrix());
+
+        System.out.println("Рассчитаны потенциалы нулевых ячеек. Выбран путь между точками " + (cyclePath[0] + 1) + " и " + (cyclePath[1] + 1));
+        System.out.println("====================================================");
+        System.out.println("====================================================");
+        System.out.println("Приступаем к нахождению правой ветви графа");
+        branches.add(findRight(cyclePath, minimalBranch.getPathMatrix(), minimalBranch));
+
+        System.out.println("====================================================");
+        System.out.println("====================================================");
+        System.out.println("Приступаем к нахождению левой ветви графа");
+        branches.add(findLeft(cyclePath, minimalBranch));
+    }
+
     //  Ветвь, в которой путь НЕ включается в итоговый
-    public static Branch findFirstLeft(int[] path, Branch parentBranch) {
+    public static Branch findLeft(int[] path, Branch parentBranch) {
         int minBound = parentBranch.getMinBound() + path[2];
         String info = "!" + (path[0] + 1) + "-" + (path[1] + 1);
         Branch newLeftBranch = new Branch(minBound, info, parentBranch.getPathMatrix(), parentBranch);
@@ -110,7 +129,7 @@ public class BranchAndBoundMethod {
     }
 
     //  Ветвь, в которой путь включается в итоговый
-    public static Branch findFirstRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
+    public static Branch findRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
         int[][] matrix = new int[pathMatrix.length][];
 
         for (int i = 0; i < pathMatrix.length; i++) {
@@ -119,14 +138,14 @@ public class BranchAndBoundMethod {
         }
 
         for (int i = 0; i < matrix.length - 1; i++) {
-            matrix[i][path[1]] = 9999;
+            matrix[i][path[1]] = 99999;
         }
 
         for (int j = 0; j < matrix[0].length - 1; j++) {
-            matrix[path[0]][j] = 9999;
+            matrix[path[0]][j] = 99999;
         }
 
-        matrix[path[1]][path[0]] = 9999;
+        matrix[path[1]][path[0]] = 99999;
 
         printMatrix(matrix);
         System.out.println("Редукция матрицы успешно проведена");
@@ -161,6 +180,35 @@ public class BranchAndBoundMethod {
                     sum++;
             }
         }
+        lostPaths = sum;
         return sum;
+    }
+
+    public static Branch findMinimalBranch(ArrayList<Branch> branches) {
+        int min = 9999999;
+        Branch minBranch = null;
+
+        for (Branch branch : branches) {
+            if (branch.getMinBound() < min && branch.getLeftChild() == null && branch.getRightChild() == null) {
+                min = branch.getMinBound();
+                minBranch = branch;
+            }
+        }
+
+        return minBranch;
+    }
+
+    public static boolean isFinished() {
+        return (lostPaths == 1);
+    }
+
+    public static int[] findLastOne(int[][] pathMatrix) {
+        for (int i = 0; i < pathMatrix.length - 1; i++) {
+            for (int j = 0; j < pathMatrix[i].length - 1; j++) {
+                if (pathMatrix[i][j] < 9999)
+                    return new int[]{i, j};
+            }
+        }
+        return null;
     }
 }

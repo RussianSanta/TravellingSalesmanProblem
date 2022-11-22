@@ -2,8 +2,9 @@ import helpers.Branch;
 
 import java.util.ArrayList;
 
-import static helpers.MatrixHelper.*;
 import static helpers.BranchAndBoundMethod.*;
+import static helpers.MatrixHelper.prepareMatrix;
+import static helpers.MatrixHelper.printMatrix;
 
 public class Pathfinder {
 
@@ -33,19 +34,62 @@ public class Pathfinder {
 
         branches.add(new Branch(minBound, "Начало", pathMatrix, null));
 
-        int[] path = findMaxScore(branches.get(0).getPathMatrix());
-        System.out.println("Рассчитаны потенциалы нулевых ячеек. Выбран путь между точками " + (path[0]+1) + " и " + (path[1]+1));
+        createChildBranches(branches, branches.get(0));
 
-        System.out.println("====================================================");
-        System.out.println("====================================================");
-        System.out.println("Приступаем к нахождению правой ветви графа");
-        Branch newRightBranch = findFirstRight(path,pathMatrix,branches.get(0));
-        branches.add(newRightBranch);
+        boolean isFound = false;
+        int counter = 0;
+        while (!isFound) {
+            Branch minimalBranch = findMinimalBranch(branches);
+            System.out.println("Найденная ветка с минимальной нижней границей: ");
+            System.out.println(minimalBranch);
 
-        System.out.println("====================================================");
-        System.out.println("====================================================");
-        System.out.println("Приступаем к нахождению левой ветви графа");
-        Branch newLeftBranch = findFirstLeft(path,branches.get(0));
-        branches.add(newLeftBranch);
+            if (!minimalBranch.getInfo().contains("!")) {
+                printMatrix(minimalBranch.getPathMatrix());
+                createChildBranches(branches, minimalBranch);
+            } else {
+                String branchInfo = minimalBranch.getInfo();
+                int a = Integer.parseInt(branchInfo.substring(1, 2));
+                int b = Integer.parseInt(branchInfo.substring(3, 4));
+                minimalBranch.getPathMatrix()[a - 1][b - 1] = 9999;
+
+                findRowMinimum(minimalBranch.getPathMatrix());
+                rowReduction(minimalBranch.getPathMatrix());
+                findColumnMinimum(minimalBranch.getPathMatrix());
+                columnReduction(minimalBranch.getPathMatrix());
+                printMatrix(minimalBranch.getPathMatrix());
+                System.out.println("Найдены минимумы и проведены редукции для строк и столбцов новой таблицы");
+
+                createChildBranches(branches, minimalBranch);
+            }
+
+            isFound = isFinished();
+            if (++counter > 25) {
+                System.out.println("Ответ не был найден за 25 циклов");
+                return;
+            }
+        }
+        Branch minimalBranch = findMinimalBranch(branches);
+        int[] lastOne = findLastOne(minimalBranch.getPathMatrix());
+        if (lastOne == null) {
+            System.out.println("Проблема при нахождении последнего отрезка пути");
+            return;
+        }
+        System.out.println("Результат найден. Итоговое расстояние = " + minimalBranch.getMinBound());
+
+        ArrayList<String> path = new ArrayList<>();
+        path.add((lastOne[0] + 1) + "-" + (lastOne[1] + 1));
+        Branch parentBranch = minimalBranch;
+        for (int i = 0; i < minimalBranch.getPathMatrix().length - 2; i++) {
+            path.add(parentBranch.getInfo());
+            parentBranch = parentBranch.getParent();
+        }
+        path.sort((o1, o2) -> {
+            if (o1.charAt(0) == '1') return -1;
+            if (o2.charAt(0) == '1') return 1;
+            if (o1.charAt(2) == o2.charAt(0)) return -1;
+            if (o2.charAt(2) == o1.charAt(0)) return 1;
+            return 0;
+        });
+        System.out.println(path);
     }
 }
