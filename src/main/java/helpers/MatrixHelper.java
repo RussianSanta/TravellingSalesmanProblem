@@ -1,14 +1,11 @@
 package helpers;
 
 public class MatrixHelper {
-    //      i - номер строки, j - номер элемента в строке
-    private static int[][] pathMatrix;
-
     private MatrixHelper() {
     }
 
-    public static void prepareMatrix() {
-        pathMatrix = new int[7][7];
+    public static int[][] prepareMatrix() {
+        int[][] pathMatrix = new int[7][7];
 /*
         1 - Московская фабрика
         2 - Самара
@@ -33,16 +30,17 @@ public class MatrixHelper {
                     System.out.println("Проблемный путь между точками: " + i + " и " + j);
                     System.out.println("Путь из " + i + " в " + j + " = " + pathMatrix[i][j]);
                     System.out.println("Путь из " + j + " в " + i + " = " + pathMatrix[j][i]);
-                    return;
+                    return null;
                 }
             }
         }
 
         System.out.println("Матрица успешно заполнена и проверена");
-        printMatrix();
+        printMatrix(pathMatrix);
+        return pathMatrix;
     }
 
-    public static void printMatrix() {
+    public static void printMatrix(int[][] pathMatrix) {
         System.out.println("====================================================");
         for (int i = 0; i < pathMatrix.length; i++) {
             if (i < pathMatrix.length - 1) System.out.print("Пути из " + (i + 1) + ": [");
@@ -64,7 +62,7 @@ public class MatrixHelper {
         System.out.println("====================================================");
     }
 
-    public static void setValue(int i, int j, int newValue) {
+    public static void setValue(int[][] pathMatrix, int i, int j, int newValue) {
         int oldValue = pathMatrix[i][j];
         pathMatrix[i][j] = newValue;
         if (i != pathMatrix.length - 1 && j != pathMatrix[i].length - 1) {
@@ -72,17 +70,5 @@ public class MatrixHelper {
             System.out.println("Расстояние между путями " + i + " и " + j + " было изменено.");
             System.out.println("Старое расстояние: " + oldValue + " Новое расстояние: " + newValue);
         }
-    }
-
-    public static int[][] getPathMatrix() {
-        if (pathMatrix == null) {
-            System.out.println("Матрица не подготовлена");
-            return null;
-        }
-        return pathMatrix;
-    }
-
-    public static void setPathMatrix(int[][] pathMatrix) {
-        MatrixHelper.pathMatrix = pathMatrix;
     }
 }
