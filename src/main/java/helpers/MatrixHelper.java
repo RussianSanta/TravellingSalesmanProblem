@@ -69,14 +69,4 @@ public class MatrixHelper {
         }
         System.out.println("====================================================");
     }
-
-    public static void setValue(int[][] pathMatrix, int i, int j, int newValue) {
-        int oldValue = pathMatrix[i][j];
-        pathMatrix[i][j] = newValue;
-        if (i != pathMatrix.length - 1 && j != pathMatrix[i].length - 1) {
-            pathMatrix[j][i] = newValue;
-            System.out.println("Расстояние между путями " + i + " и " + j + " было изменено.");
-            System.out.println("Старое расстояние: " + oldValue + " Новое расстояние: " + newValue);
-        }
-    }
 }
