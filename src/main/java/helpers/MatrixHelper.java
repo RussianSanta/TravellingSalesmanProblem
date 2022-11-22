@@ -15,13 +15,13 @@ public class MatrixHelper {
         6 - Санкт-Петербург
         7 - Вспомогательная строка(столбец) для расчетов
  */
-        pathMatrix[0] = new int[]{9999, 1051, 406, 1903, 1234, 679, 9999};
-        pathMatrix[1] = new int[]{1051, 9999, 775, 1046, 2285, 1730, 9999};
-        pathMatrix[2] = new int[]{406, 775, 9999, 1497, 1640, 1085, 9999};
-        pathMatrix[3] = new int[]{1903, 1046, 1497, 9999, 3118, 2582, 9999};
-        pathMatrix[4] = new int[]{1234, 2285, 1640, 3118, 9999, 1435, 9999};
-        pathMatrix[5] = new int[]{679, 1730, 1085, 2582, 1435, 9999, 9999};
-        pathMatrix[6] = new int[]{9999, 9999, 9999, 9999, 9999, 9999, 0};
+        pathMatrix[0] = new int[]{9999, 1051, 406, 1903, 1234, 679, 0};
+        pathMatrix[1] = new int[]{1051, 9999, 775, 1046, 2285, 1730, 0};
+        pathMatrix[2] = new int[]{406, 775, 9999, 1497, 1640, 1085, 0};
+        pathMatrix[3] = new int[]{1903, 1046, 1497, 9999, 3118, 2582, 0};
+        pathMatrix[4] = new int[]{1234, 2285, 1640, 3118, 9999, 1435, 0};
+        pathMatrix[5] = new int[]{679, 1730, 1085, 2582, 1435, 9999, 0};
+        pathMatrix[6] = new int[]{0, 0, 0, 0, 0, 0, 0};
 
         for (int i = 0; i < 6; i++) {
             for (int j = 0; j < 6; j++) {
@@ -47,7 +47,7 @@ public class MatrixHelper {
             else System.out.print("            ");
             for (int j = 0; j < pathMatrix[i].length; j++) {
                 StringBuilder pathLength = new StringBuilder(String.valueOf(pathMatrix[i][j]));
-                int lengthDelta = 4 - pathLength.length();
+                int lengthDelta = 5 - pathLength.length();
                 pathLength.append(" ".repeat(lengthDelta));
                 System.out.print(pathLength);
                 if (j < pathMatrix[i].length - 2 && i != pathMatrix.length - 1) {
