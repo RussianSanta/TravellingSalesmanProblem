@@ -109,7 +109,7 @@ public class BranchAndBoundMethod {
     }
 
     //  Ветвь, в которой путь включается в итоговый
-    public static void findRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
+    public static Branch findRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
         int[][] matrix = new int[pathMatrix.length][];
 
         for (int i = 0; i < pathMatrix.length; i++) {
@@ -147,5 +147,19 @@ public class BranchAndBoundMethod {
         System.out.println("Создана новая правая ветка:");
         System.out.println(newRightBranch);
         System.out.println("====================================================");
+        System.out.println("Осталось рассмотреть путей: " + getCountOfPath(matrix));
+
+        return newRightBranch;
+    }
+
+    private static int getCountOfPath(int[][] pathMatrix) {
+        int sum = 0;
+        for (int i = 0; i < pathMatrix.length - 1; i++) {
+            for (int j = 0; j < pathMatrix[i].length - 1; j++) {
+                if (pathMatrix[i][j] < 9999)
+                    sum++;
+            }
+        }
+        return sum;
     }
 }
