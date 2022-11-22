@@ -41,5 +41,11 @@ public class Pathfinder {
         System.out.println("Приступаем к нахождению правой ветви графа");
         Branch newRightBranch = findFirstRight(path,pathMatrix,branches.get(0));
         branches.add(newRightBranch);
+
+        System.out.println("====================================================");
+        System.out.println("====================================================");
+        System.out.println("Приступаем к нахождению левой ветви графа");
+        Branch newLeftBranch = findFirstLeft(path,branches.get(0));
+        branches.add(newLeftBranch);
     }
 }

@@ -69,11 +69,11 @@ public class BranchAndBoundMethod {
         int minRow = 9999;
         int minColumn = 9999;
 
-        for (int i = 0; i < pathMatrix.length-1; i++) {
+        for (int i = 0; i < pathMatrix.length - 1; i++) {
             if (pathMatrix[i][b] < minRow && i != a) minRow = pathMatrix[i][b];
         }
 
-        for (int j = 0; j < pathMatrix[0].length-1; j++) {
+        for (int j = 0; j < pathMatrix[0].length - 1; j++) {
             if (pathMatrix[a][j] < minColumn && j != b) minColumn = pathMatrix[a][j];
         }
         return minColumn + minRow;
@@ -97,15 +97,16 @@ public class BranchAndBoundMethod {
     }
 
     //  Ветвь, в которой путь НЕ включается в итоговый
-    public static void findFirstLeft(int[] path, int[][] pathMatrix, Branch parentBranch) {
-        int[][] matrix = new int[pathMatrix.length][];
-
-        for (int i = 0; i < pathMatrix.length; i++) {
-            matrix[i] = new int[pathMatrix[i].length];
-            System.arraycopy(pathMatrix[i], 0, matrix[i], 0, pathMatrix[i].length);
-        }
-
-
+    public static Branch findFirstLeft(int[] path, Branch parentBranch) {
+        int minBound = parentBranch.getMinBound() + path[2];
+        String info = "!" + (path[0] + 1) + "-" + (path[1] + 1);
+        Branch newLeftBranch = new Branch(minBound, info, parentBranch.getPathMatrix(), parentBranch);
+        parentBranch.setLeftChild(newLeftBranch);
+        System.out.println("====================================================");
+        System.out.println("Создана новая левая ветка:");
+        System.out.println(newLeftBranch);
+        System.out.println("====================================================");
+        return newLeftBranch;
     }
 
     //  Ветвь, в которой путь включается в итоговый
