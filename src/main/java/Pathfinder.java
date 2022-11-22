@@ -12,8 +12,7 @@ public class Pathfinder {
         int[][] pathMatrix = prepareMatrix();
         ArrayList<Branch> branches = new ArrayList<>();
 
-        assert pathMatrix != null;
-        findRowMinimum(pathMatrix, false);
+        findRowMinimum(pathMatrix);
         printMatrix(pathMatrix);
         System.out.println("Минимумы строк успешно найдены");
 
@@ -21,7 +20,7 @@ public class Pathfinder {
         printMatrix(pathMatrix);
         System.out.println("Редукция строк успешно проведена");
 
-        findColumnMinimum(pathMatrix, false);
+        findColumnMinimum(pathMatrix);
         printMatrix(pathMatrix);
         System.out.println("Минимумы столбцов успешно найдены");
 
@@ -34,17 +33,13 @@ public class Pathfinder {
 
         branches.add(new Branch(minBound, "Начало", pathMatrix, null));
 
-        calculateScore(branches.get(0).getPathMatrix());
-        printMatrix(branches.get(0).getPathMatrix());
-        System.out.println("Рассчитаны потенциалы нулевых ячеек");
-
         int[] path = findMaxScore(branches.get(0).getPathMatrix());
-        System.out.println("Выбран путь между точками " + (path[0]+1) + " и " + (path[1]+1));
+        System.out.println("Рассчитаны потенциалы нулевых ячеек. Выбран путь между точками " + (path[0]+1) + " и " + (path[1]+1));
 
         System.out.println("====================================================");
         System.out.println("====================================================");
         System.out.println("Приступаем к нахождению правой ветви графа");
-        Branch newRightBranch = findRight(path,pathMatrix,branches.get(0));
+        Branch newRightBranch = findFirstRight(path,pathMatrix,branches.get(0));
         branches.add(newRightBranch);
     }
 }

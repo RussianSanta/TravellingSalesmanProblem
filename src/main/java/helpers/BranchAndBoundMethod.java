@@ -7,33 +7,24 @@ public class BranchAndBoundMethod {
 
     }
 
-    public static int[][] findRowMinimum(int[][] pathMatrix, boolean checkZero) {
+    public static int[][] findRowMinimum(int[][] pathMatrix) {
         for (int i = 0; i < pathMatrix.length - 1; i++) {
             pathMatrix[i][pathMatrix[i].length - 1] = pathMatrix[i][0];
             for (int j = 0; j < pathMatrix[i].length - 1; j++) {
-                if (checkZero) {
-                    if (pathMatrix[i][j] < pathMatrix[i][pathMatrix[i].length - 1] && pathMatrix[i][j] != 0)
-                        pathMatrix[i][pathMatrix[i].length - 1] = pathMatrix[i][j];
-                } else {
-                    if (pathMatrix[i][j] < pathMatrix[i][pathMatrix[i].length - 1])
-                        pathMatrix[i][pathMatrix[i].length - 1] = pathMatrix[i][j];
-                }
+                if (pathMatrix[i][j] < pathMatrix[i][pathMatrix[i].length - 1])
+                    pathMatrix[i][pathMatrix[i].length - 1] = pathMatrix[i][j];
             }
         }
         return pathMatrix;
     }
 
-    public static int[][] findColumnMinimum(int[][] pathMatrix, boolean checkZero) {
+    public static int[][] findColumnMinimum(int[][] pathMatrix) {
         for (int j = 0; j < pathMatrix[0].length - 1; j++) {
             pathMatrix[pathMatrix.length - 1][j] = pathMatrix[0][j];
             for (int i = 0; i < pathMatrix.length - 1; i++) {
-                if (checkZero) {
-                    if (pathMatrix[i][j] < pathMatrix[pathMatrix.length - 1][j] && pathMatrix[i][j] != 0)
-                        pathMatrix[pathMatrix.length - 1][j] = pathMatrix[i][j];
-                } else {
-                    if (pathMatrix[i][j] < pathMatrix[pathMatrix.length - 1][j])
-                        pathMatrix[pathMatrix.length - 1][j] = pathMatrix[i][j];
-                }
+                if (pathMatrix[i][j] < pathMatrix[pathMatrix.length - 1][j])
+                    pathMatrix[pathMatrix.length - 1][j] = pathMatrix[i][j];
+
             }
         }
         return pathMatrix;
@@ -74,42 +65,51 @@ public class BranchAndBoundMethod {
         return sum;
     }
 
-    public static int[][] calculateScore(int[][] pathMatrix) {
-        findRowMinimum(pathMatrix, true);
-        findColumnMinimum(pathMatrix, true);
-        for (int i = 0; i < pathMatrix.length - 1; i++) {
-            for (int j = 0; j < pathMatrix[i].length - 1; j++) {
-                if (pathMatrix[i][j] == 0)
-                    pathMatrix[i][j] = pathMatrix[i][j] - pathMatrix[pathMatrix.length - 1][j]
-                            - pathMatrix[i][pathMatrix[i].length - 1];
-            }
+    private static int calculateScore(int[][] pathMatrix, int a, int b) {
+        int minRow = 9999;
+        int minColumn = 9999;
+
+        for (int i = 0; i < pathMatrix.length-1; i++) {
+            if (pathMatrix[i][b] < minRow && i != a) minRow = pathMatrix[i][b];
         }
-        return pathMatrix;
+
+        for (int j = 0; j < pathMatrix[0].length-1; j++) {
+            if (pathMatrix[a][j] < minColumn && j != b) minColumn = pathMatrix[a][j];
+        }
+        return minColumn + minRow;
     }
 
     public static int[] findMaxScore(int[][] pathMatrix) {
-        int min = 9999;
+        int max = 0;
         int lastI = -1;
         int lastJ = -1;
         for (int i = 0; i < pathMatrix.length - 1; i++) {
             for (int j = 0; j < pathMatrix[i].length - 1; j++) {
-                if (pathMatrix[i][j] < min) {
-                    min = pathMatrix[i][j];
+                int potential = calculateScore(pathMatrix, i, j);
+                if (potential > max) {
+                    max = potential;
                     lastI = i;
                     lastJ = j;
                 }
             }
         }
-        return new int[]{lastI, lastJ};
+        return new int[]{lastI, lastJ, max};
     }
 
     //  Ветвь, в которой путь НЕ включается в итоговый
-    public static void findLeft() {
+    public static void findFirstLeft(int[] path, int[][] pathMatrix, Branch parentBranch) {
+        int[][] matrix = new int[pathMatrix.length][];
+
+        for (int i = 0; i < pathMatrix.length; i++) {
+            matrix[i] = new int[pathMatrix[i].length];
+            System.arraycopy(pathMatrix[i], 0, matrix[i], 0, pathMatrix[i].length);
+        }
+
 
     }
 
     //  Ветвь, в которой путь включается в итоговый
-    public static Branch findRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
+    public static Branch findFirstRight(int[] path, int[][] pathMatrix, Branch parentBranch) {
         int[][] matrix = new int[pathMatrix.length][];
 
         for (int i = 0; i < pathMatrix.length; i++) {
@@ -130,9 +130,9 @@ public class BranchAndBoundMethod {
         printMatrix(matrix);
         System.out.println("Редукция матрицы успешно проведена");
 
-        findRowMinimum(matrix, false);
+        findRowMinimum(matrix);
         rowReduction(matrix);
-        findColumnMinimum(matrix, false);
+        findColumnMinimum(matrix);
         columnReduction(matrix);
 
         int minBound = getLocalMinimumBound(matrix, parentBranch.getMinBound());
