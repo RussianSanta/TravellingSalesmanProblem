@@ -53,9 +53,17 @@ public class Pathfinder {
                 minimalBranch.getPathMatrix()[a - 1][b - 1] = 9999;
 
                 findRowMinimum(minimalBranch.getPathMatrix());
+                printMatrix(pathMatrix);
+                System.out.println("Минимумы строк успешно найдены");
                 rowReduction(minimalBranch.getPathMatrix());
+                printMatrix(pathMatrix);
+                System.out.println("Редукция строк успешно проведена");
                 findColumnMinimum(minimalBranch.getPathMatrix());
+                printMatrix(pathMatrix);
+                System.out.println("Минимумы столбцов успешно найдены");
                 columnReduction(minimalBranch.getPathMatrix());
+                printMatrix(pathMatrix);
+                System.out.println("Редукция столбцов успешно проведена");
                 printMatrix(minimalBranch.getPathMatrix());
                 System.out.println("Найдены минимумы и проведены редукции для строк и столбцов новой таблицы");
 
@@ -68,28 +76,34 @@ public class Pathfinder {
                 return;
             }
         }
-        Branch minimalBranch = findMinimalBranch(branches);
-        int[] lastOne = findLastOne(minimalBranch.getPathMatrix());
+        Branch preLastBranch = branches.get(branches.size()-2);
+        int[] lastOne = findLastOne(preLastBranch.getPathMatrix());
         if (lastOne == null) {
             System.out.println("Проблема при нахождении последнего отрезка пути");
             return;
         }
-        System.out.println("Результат найден. Итоговое расстояние = " + minimalBranch.getMinBound());
+        System.out.println("Результат найден. Итоговое расстояние = " + preLastBranch.getMinBound());
 
         ArrayList<String> path = new ArrayList<>();
         path.add((lastOne[0] + 1) + "-" + (lastOne[1] + 1));
-        Branch parentBranch = minimalBranch;
-        for (int i = 0; i < minimalBranch.getPathMatrix().length - 2; i++) {
+        Branch parentBranch = preLastBranch;
+        for (int i = 0; i < pathMatrix.length-2; i++) {
             path.add(parentBranch.getInfo());
             parentBranch = parentBranch.getParent();
+            if (parentBranch == null) break;
         }
+        System.out.println(path);
         path.sort((o1, o2) -> {
             if (o1.charAt(0) == '1') return -1;
             if (o2.charAt(0) == '1') return 1;
+            if (o1.charAt(2) == '1') return 1;
+            if (o2.charAt(2) == '1') return -1;
             if (o1.charAt(2) == o2.charAt(0)) return -1;
             if (o2.charAt(2) == o1.charAt(0)) return 1;
             return 0;
         });
         System.out.println(path);
+
+        System.out.println(preLastBranch);
     }
 }

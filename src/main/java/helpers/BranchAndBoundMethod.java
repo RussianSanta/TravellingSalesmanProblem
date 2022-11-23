@@ -83,27 +83,88 @@ public class BranchAndBoundMethod {
         return minColumn + minRow;
     }
 
-    public static int[] findMaxScore(int[][] pathMatrix) {
-        int max = 0;
+    public static int[] findMaxScore(int[][] pathMatrix, Branch parentBranch) {
+        int max = -1;
         int lastI = -1;
         int lastJ = -1;
+
         for (int i = 0; i < pathMatrix.length - 1; i++) {
             for (int j = 0; j < pathMatrix[i].length - 1; j++) {
-                int potential = calculateScore(pathMatrix, i, j);
-                if (potential > max && potential < 10000) {
-                    max = potential;
-                    lastI = i;
-                    lastJ = j;
+                if (pathMatrix[i][j] == 0) {
+                    if (isCycle(i, j, parentBranch)) {
+                        pathMatrix[i][j] = 9999;
+                        findRowMinimum(pathMatrix);
+                        rowReduction(pathMatrix);
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < pathMatrix.length - 1; i++) {
+            for (int j = 0; j < pathMatrix[i].length - 1; j++) {
+                if (pathMatrix[i][j] == 0) {
+                    int potential = calculateScore(pathMatrix, i, j);
+                    if (potential > max && potential < 20000) {
+                        max = potential;
+                        lastI = i;
+                        lastJ = j;
+                    }
                 }
             }
         }
         return new int[]{lastI, lastJ, max};
     }
 
-    public static void createChildBranches(ArrayList<Branch> branches, Branch minimalBranch) {
-        int[] cyclePath = findMaxScore(minimalBranch.getPathMatrix());
+    private static boolean isCycle(int a, int b, Branch parentBranch) {
+        ArrayList<Branch> branches = new ArrayList<>();
+        String info = parentBranch.getInfo();
+        ArrayList<String> path = new ArrayList<>();
+        path.add((a + 1) + "-" + (b + 1));
+        while (!(info.contains("!") || info.length() > 3)) {
+            path.add(info);
+            branches.add(parentBranch);
+            parentBranch = parentBranch.getParent();
+            info = parentBranch.getInfo();
+        }
+        path.sort((o1, o2) -> {
+            if (o1.charAt(0) == '1') return -1;
+            if (o2.charAt(0) == '1') return 1;
+            if (o1.charAt(2) == '1') return 1;
+            if (o2.charAt(2) == '1') return -1;
+            if (o1.charAt(2) == o2.charAt(0)) return -1;
+            if (o2.charAt(2) == o1.charAt(0)) return 1;
+            return 0;
+        });
 
-        System.out.println("Рассчитаны потенциалы нулевых ячеек. Выбран путь между точками " + (cyclePath[0] + 1) + " и " + (cyclePath[1] + 1));
+        int i = 0;
+        boolean isCycle = false;
+        ArrayList<String> cycle = new ArrayList<>();
+        cycle.add(path.get(0));
+        while (i < path.size() - 1) {
+            int index = i + 1;
+            if (index > path.size() - 1) index = 0;
+            if (path.get(i).charAt(2) == path.get(index).charAt(0)) cycle.add(path.get(index));
+            else {
+                if (cycle.size() > 1 && cycle.get(0).charAt(0) == cycle.get(cycle.size() - 1).charAt(2)) {
+                    isCycle = true;
+                    break;
+                }
+                cycle.clear();
+                cycle.add(path.get(index));
+            }
+            i++;
+        }
+        if (cycle.size() > 1 && cycle.get(0).charAt(0) == cycle.get(cycle.size() - 1).charAt(2)) {
+            isCycle = true;
+        }
+        return isCycle;
+    }
+
+    public static void createChildBranches(ArrayList<Branch> branches, Branch minimalBranch) {
+        int[] cyclePath = findMaxScore(minimalBranch.getPathMatrix(), minimalBranch);
+
+        System.out.println("Рассчитаны потенциалы нулевых ячеек. Выбран путь между точками " + (cyclePath[0] + 1) + " и "
+                + (cyclePath[1] + 1) + ". Потенциал = " + cyclePath[2]);
         System.out.println("====================================================");
         System.out.println("====================================================");
         System.out.println("Приступаем к нахождению правой ветви графа");
@@ -145,15 +206,26 @@ public class BranchAndBoundMethod {
             matrix[path[0]][j] = 99999;
         }
 
-        matrix[path[1]][path[0]] = 99999;
+        matrix[path[1]][path[0]] = 9999;
 
         printMatrix(matrix);
         System.out.println("Редукция матрицы успешно проведена");
 
         findRowMinimum(matrix);
+        printMatrix(matrix);
+        System.out.println("Минимумы строк успешно найдены");
+
         rowReduction(matrix);
+        printMatrix(matrix);
+        System.out.println("Редукция строк успешно проведена");
+
         findColumnMinimum(matrix);
+        printMatrix(matrix);
+        System.out.println("Минимумы столбцов успешно найдены");
+
         columnReduction(matrix);
+        printMatrix(matrix);
+        System.out.println("Редукция столбцов успешно проведена");
 
         int minBound = getLocalMinimumBound(matrix, parentBranch.getMinBound());
         printMatrix(matrix);
