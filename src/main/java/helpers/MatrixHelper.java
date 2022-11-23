@@ -43,8 +43,6 @@ public class MatrixHelper {
 //        pathMatrix[4] = new int[]{5, 5, 5, 5, 9999, 0};
 //        pathMatrix[5] = new int[]{0, 0, 0, 0, 0, 0};
 
-        System.out.println("Матрица успешно заполнена и проверена");
-        printMatrix(pathMatrix);
         return pathMatrix;
     }
 

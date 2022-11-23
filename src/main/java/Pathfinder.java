@@ -11,6 +11,9 @@ public class Pathfinder {
     public static void main(String[] args) {
         //  i - номер строки, j - номер элемента в строке
         int[][] pathMatrix = prepareMatrix();
+        assert pathMatrix != null;
+        printMatrix(pathMatrix);
+        System.out.println("Матрица успешно заполнена и проверена");
         ArrayList<Branch> branches = new ArrayList<>();
 
         findRowMinimum(pathMatrix);
@@ -76,34 +79,24 @@ public class Pathfinder {
                 return;
             }
         }
-        Branch preLastBranch = branches.get(branches.size()-2);
+        Branch preLastBranch = branches.get(branches.size() - 2);
         int[] lastOne = findLastOne(preLastBranch.getPathMatrix());
         if (lastOne == null) {
             System.out.println("Проблема при нахождении последнего отрезка пути");
             return;
         }
-        System.out.println("Результат найден. Итоговое расстояние = " + preLastBranch.getMinBound());
 
         ArrayList<String> path = new ArrayList<>();
         path.add((lastOne[0] + 1) + "-" + (lastOne[1] + 1));
         Branch parentBranch = preLastBranch;
-        for (int i = 0; i < pathMatrix.length-2; i++) {
+        for (int i = 0; i < pathMatrix.length - 2; i++) {
             path.add(parentBranch.getInfo());
             parentBranch = parentBranch.getParent();
             if (parentBranch == null) break;
         }
+        path = finalSort(path);
+        System.out.print("Результат найден. Итоговый путь: ");
         System.out.println(path);
-        path.sort((o1, o2) -> {
-            if (o1.charAt(0) == '1') return -1;
-            if (o2.charAt(0) == '1') return 1;
-            if (o1.charAt(2) == '1') return 1;
-            if (o2.charAt(2) == '1') return -1;
-            if (o1.charAt(2) == o2.charAt(0)) return -1;
-            if (o2.charAt(2) == o1.charAt(0)) return 1;
-            return 0;
-        });
-        System.out.println(path);
-
-        System.out.println(preLastBranch);
+        System.out.print("Итоговое расстояние: " + distanceCalculator(path, prepareMatrix()));
     }
 }

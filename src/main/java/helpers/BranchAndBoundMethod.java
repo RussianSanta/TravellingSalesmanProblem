@@ -126,15 +126,7 @@ public class BranchAndBoundMethod {
             parentBranch = parentBranch.getParent();
             info = parentBranch.getInfo();
         }
-        path.sort((o1, o2) -> {
-            if (o1.charAt(0) == '1') return -1;
-            if (o2.charAt(0) == '1') return 1;
-            if (o1.charAt(2) == '1') return 1;
-            if (o2.charAt(2) == '1') return -1;
-            if (o1.charAt(2) == o2.charAt(0)) return -1;
-            if (o2.charAt(2) == o1.charAt(0)) return 1;
-            return 0;
-        });
+        pathSort(path);
 
         int i = 0;
         boolean isCycle = false;
@@ -158,6 +150,48 @@ public class BranchAndBoundMethod {
             isCycle = true;
         }
         return isCycle;
+    }
+
+    public static void pathSort(ArrayList<String> path) {
+        path.sort((o1, o2) -> {
+            if (o1.charAt(0) == '1') return -1;
+            if (o2.charAt(0) == '1') return 1;
+            if (o1.charAt(2) == '1') return 1;
+            if (o2.charAt(2) == '1') return -1;
+            if (o1.charAt(2) == o2.charAt(0)) return -1;
+            if (o2.charAt(2) == o1.charAt(0)) return 1;
+            return 0;
+        });
+    }
+
+    public static ArrayList<String> finalSort(ArrayList<String> paths) {
+        ArrayList<String> sortedPath = new ArrayList<>();
+        for (String p : paths) {
+            if (p.charAt(0) == '1') {
+                sortedPath.add(p);
+                break;
+            }
+        }
+        while (sortedPath.size() < paths.size()) {
+            for (String p : paths) {
+                if (p.charAt(0) == sortedPath.get(sortedPath.size() - 1).charAt(2)) {
+                    sortedPath.add(p);
+                    break;
+                }
+            }
+        }
+
+        return sortedPath;
+    }
+
+    public static int distanceCalculator(ArrayList<String> sortedPath, int[][] pathMatrix) {
+        int sum = 0;
+
+        for (String path : sortedPath) {
+            sum = sum + pathMatrix[Integer.parseInt(String.valueOf(path.charAt(0))) - 1][Integer.parseInt(String.valueOf(path.charAt(2))) - 1];
+        }
+
+        return sum;
     }
 
     public static void createChildBranches(ArrayList<Branch> branches, Branch minimalBranch) {
